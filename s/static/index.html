@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Business Intelligence Report Assistant</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --surface: #111827;
+      --surface-2: #1e293b;
+      --border: #2b384e;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #818cf8;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #172554 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .hidden { display: none !important; }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+    .auth-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 430px;
+      background: rgba(17, 24, 39, 0.96);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+    .auth-tabs {
+      display: flex;
+      gap: 8px;
+      margin: 18px 0 16px;
+    }
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 9px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .auth-tab.active {
+      border-color: var(--accent);
+      color: var(--text);
+      background: rgba(56, 189, 248, 0.12);
+    }
+    .field { margin-bottom: 12px; }
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .field input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .auth-error {
+      color: var(--danger);
+      font-size: 0.85rem;
+      min-height: 20px;
+      margin: 4px 0 10px;
+    }
+    .divider {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin: 16px 0;
+      position: relative;
+    }
+    .divider::before, .divider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 36%;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .user-pill {
+      font-size: 0.82rem;
+      color: var(--success);
+      background: rgba(52, 211, 153, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      padding: 6px 12px;
+      border-radius: 999px;
+    }
+    button, .file-btn {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.15s ease;
+    }
+    button:hover, .file-btn:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    button.primary, .file-btn.primary {
+      background: linear-gradient(135deg, #0284c7, #4f46e5);
+      border: none;
+    }
+    button.full { width: 100%; }
+    input[type="file"] { display: none; }
+    .dropzone {
+      border: 2px dashed var(--border);
+      background: rgba(17, 24, 39, 0.75);
+      border-radius: 14px;
+      padding: 22px;
+      text-align: center;
+      margin-bottom: 22px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .dropzone.dragover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+    }
+    .doc-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .pill {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      color: var(--accent);
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .card {
+      background: rgba(17, 24, 39, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .kpi-label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .kpi-value {
+      font-size: 1.55rem;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 1.12rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(52, 211, 153, 0.16);
+      color: var(--success);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+    }
+    .badge.warn {
+      background: rgba(251, 191, 36, 0.14);
+      color: var(--warning);
+      border-color: rgba(251, 191, 36, 0.35);
+    }
+    ul.clean {
+      margin: 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      line-height: 1.45;
+      color: #dbeafe;
+    }
+    .bar-row { margin-bottom: 12px; }
+    .bar-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      margin-bottom: 4px;
+    }
+    .bar-track {
+      height: 10px;
+      background: var(--surface-2);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 999px;
+    }
+    .bar-fill.winner {
+      background: linear-gradient(90deg, #10b981, #38bdf8);
+    }
+    .query-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .query-box input {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .quick-prompts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .chip {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .chip:hover { color: var(--text); border-color: var(--accent); }
+    .answer-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      font-size: 0.92rem;
+    }
+    .evidence-item {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-left: 3px solid var(--accent);
+      background: rgba(30, 41, 59, 0.55);
+      border-radius: 6px;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+    .rec-item {
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+    .rec-title { font-weight: 700; margin-bottom: 4px; }
+    .rec-meta { color: var(--muted); font-size: 0.86rem; line-height: 1.45; }
+    .empty { color: var(--muted); font-style: italic; }
+  </style>
+</head>
+<body>
+  <section id="authView" class="auth-wrapper">
+    <div class="auth-card">
+      <h1>AI BI Report Assistant</h1>
+      <p class="subtitle">Sign in to your private workspace or enter instantly with Demo Access.</p>
+
+      <div class="auth-tabs">
+        <button id="tabLogin" class="auth-tab active" type="button">Sign In</button>
+        <button id="tabRegister" class="auth-tab" type="button">Create Account</button>
+      </div>
+
+      <form id="authForm">
+        <div class="field">
+          <label for="authUsername">Username</label>
+          <input id="authUsername" type="text" required minlength="3" maxlength="32" placeholder="e.g. analyst" />
+        </div>
+        <div class="field">
+          <label for="authPassword">Password</label>
+          <input id="authPassword" type="password" required minlength="6" placeholder="At least 6 characters" />
+        </div>
+        <div id="authError" class="auth-error"></div>
+        <button id="authSubmitBtn" type="submit" class="primary full">Sign In</button>
+      </form>
+
+      <div class="divider">or</div>
+      <button id="demoLoginBtn" type="button" class="full">1-Click Demo Workspace</button>
+    </div>
+  </section>
+
+  <main id="appView" class="container hidden">
+    <header>
+      <div>
+        <h1>AI Business Intelligence Report Assistant</h1>
+        <p class="subtitle">Upload sales &amp; business reports, retrieve insights, identify top regions, and generate recommendations.</p>
+      </div>
+      <div class="actions">
+        <span id="userPill" class="user-pill">User</span>
+        <label class="file-btn primary">
+          Upload Reports
+          <input id="fileInput" type="file" multiple accept=".csv,.tsv,.json,.txt,.md" />
+        </label>
+        <button id="sampleBtn">Load Sample Reports</button>
+        <button id="exportBtn">Export Report (.md)</button>
+        <button id="clearBtn">Clear</button>
+        <button id="logoutBtn">Sign Out</button>
+      </div>
+    </header>
+
+    <div id="dropzone" class="dropzone">
+      <div><strong>Drag &amp; drop</strong> CSV, TSV, JSON, TXT, or Markdown reports here — or click <em>Upload Reports</em>.</div>
+      <div id="docPills" class="doc-pills"><span class="empty">No reports loaded yet.</span></div>
+    </div>
+
+    <div id="kpiGrid" class="kpi-grid"></div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2>Challenge: Best-Performing Region <span id="bestBadge" class="badge">Pending</span></h2>
+        <p id="bestExplanation" class="empty">Load reports to identify the winning region and its drivers.</p>
+        <ul id="bestReasons" class="clean"></ul>
+      </div>
+
+      <div class="card">
+        <h2>Regional Revenue &amp; Margin Comparison</h2>
+        <div id="regionBars" class="empty">No regional metrics available yet.</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2>Executive Performance Summary</h2>
+        <ul id="summaryFindings" class="clean"><li class="empty">Waiting for report data...</li></ul>
+      </div>
+
+      <div class="card">
+        <h2>AI Recommendations</h2>
+        <div id="recommendations" class="empty">Recommendations will appear after analyzing uploaded reports.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Retrieve Relevant Business Information (Q&amp;A)</h2>
+      <div class="query-box">
+        <input id="queryInput" type="text" placeholder="Ask a question about your uploaded reports (e.g., Why did North America perform best?)" />
+        <button id="askBtn" class="primary">Ask Assistant</button>
+      </div>
+      <div class="quick-prompts">
+        <button class="chip" data-q="Which region performed best and why?">Which region performed best and why?</button>
+        <button class="chip" data-q="Summarize overall performance and key KPIs">Summarize overall performance</button>
+        <button class="chip" data-q="What operational risks or bottlenecks are mentioned?">Operational risks &amp; bottlenecks</button>
+        <button class="chip" data-q="What recommendations should we take next?">Next recommendations</button>
+      </div>
+      <div id="queryAnswer" class="answer-box empty">Ask a question above to retrieve relevant passages and metrics from your reports.</div>
+      <div id="queryEvidence"></div>
+    </div>
+  </main>
+
+  <script>
+    let authMode = "login";
+    let latestAnalysis = null;
+
+    const fmtCurrency = (n) => "$" + Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 0 });
+    const esc = (s) => String(s ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+
+    function showAuthView() {
+      document.getElementById("authView").classList.remove("hidden");
+      document.getElementById("appView").classList.add("hidden");
+    }
+
+    function showAppView(username) {
+      document.getElementById("userPill").textContent = `Workspace: ${username}`;
+      document.getElementById("authView").classList.add("hidden");
+      document.getElementById("appView").classList.remove("hidden");
+      refreshAnalysis();
+    }
+
+    async function checkSession() {
+      const res = await fetch("/api/auth/me");
+      const data = await res.json();
+      if (data.authenticated) {
+        showAppView(data.username);
+      } else {
+        showAuthView();
+      }
+    }
+
+    async function refreshAnalysis() {
+      const res = await fetch("/api/analysis");
+      if (res.status === 401) {
+        showAuthView();
+        return;
+      }
+      const data = await res.json();
+      renderAnalysis(data);
+    }
+
+    async function readFiles(fileList) {
+      const files = [];
+      for (const file of fileList) {
+        const content = await file.text();
+        files.push({ name: file.name, content });
+      }
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ files, replace: false }),
+      });
+      if (res.status === 401) return showAuthView();
+      const data = await res.json();
+      if (data.error) return alert(data.error);
+      renderAnalysis(data.analysis);
+    }
+
+    function renderAnalysis(analysis) {
+      latestAnalysis = analysis;
+      const docs = analysis.documents || [];
+      const pillsEl = document.getElementById("docPills");
+      pillsEl.innerHTML = docs.length
+        ? docs.map(d => `<span class="pill">${esc(d.filename)} (${d.records_added} rows, ${d.chunks_added} chunks)</span>`).join("")
+        : `<span class="empty">No reports loaded yet.</span>`;
+
+      const summary = analysis.summary || {};
+      const kpis = summary.kpis || {};
+      const kpiGrid = document.getElementById("kpiGrid");
+      if (summary.has_data) {
+        kpiGrid.innerHTML = `
+          <div class="card"><div class="kpi-label">Total Revenue</div><div class="kpi-value">${fmtCurrency(kpis.total_revenue)}</div></div>
+          <div class="card"><div class="kpi-label">Total Profit</div><div class="kpi-value">${fmtCurrency(kpis.total_profit)}</div></div>
+          <div class="card"><div class="kpi-label">Profit Margin</div><div class="kpi-value">${kpis.profit_margin_pct}%</div></div>
+          <div class="card"><div class="kpi-label">Avg Growth</div><div class="kpi-value">${kpis.avg_growth_pct !== null ? kpis.avg_growth_pct + "%" : "N/A"}</div></div>
+          <div class="card"><div class="kpi-label">Top Category</div><div class="kpi-value" style="font-size:1.15rem;">${esc(summary.top_category?.name || "N/A")}</div></div>
+        `;
+      } else {
+        kpiGrid.innerHTML = "";
+      }
+
+      const best = analysis.best_region_analysis || {};
+      document.getElementById("bestBadge").textContent = best.best_region ? `Winner: ${best.best_region}` : "Pending";
+      const expEl = document.getElementById("bestExplanation");
+      expEl.textContent = best.explanation || "Load reports to identify the winning region and its drivers.";
+      expEl.className = best.best_region ? "" : "empty";
+      document.getElementById("bestReasons").innerHTML = (best.reasons || []).map(r => `<li>${esc(r)}</li>`).join("");
+
+      const ranking = best.ranking || [];
+      const barsEl = document.getElementById("regionBars");
+      if (ranking.length) {
+        const maxRev = Math.max(...ranking.map(r => r.revenue), 1);
+        barsEl.className = "";
+        barsEl.innerHTML = ranking.map((r, idx) => `
+          <div class="bar-row">
+            <div class="bar-head">
+              <strong>${idx === 0 ? "★ " : ""}${esc(r.region)}</strong>
+              <span>${fmtCurrency(r.revenue)} · Margin ${r.margin_pct}%${r.avg_growth_pct !== null ? " · Growth +" + r.avg_growth_pct + "%" : ""}</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill ${idx === 0 ? "winner" : ""}" style="width:${Math.max(4, (r.revenue / maxRev) * 100)}%"></div></div>
+          </div>
+        `).join("");
+      } else {
+        barsEl.className = "empty";
+        barsEl.textContent = "No regional metrics available yet.";
+      }
+
+      const findingsEl = document.getElementById("summaryFindings");
+      findingsEl.innerHTML = (summary.findings || []).map(f => `<li>${esc(f)}</li>`).join("");
+
+      const recs = analysis.recommendations || [];
+      const recsEl = document.getElementById("recommendations");
+      if (recs.length) {
+        recsEl.className = "";
+        recsEl.innerHTML = recs.map(r => `
+          <div class="rec-item">
+            <div class="rec-title"><span class="badge ${r.priority === "Medium" ? "warn" : ""}">${esc(r.priority)}</span> ${esc(r.title)}</div>
+            <div class="rec-meta"><strong>Why:</strong> ${esc(r.rationale)}<br/><strong>Action:</strong> ${esc(r.action)}</div>
+          </div>
+        `).join("");
+      } else {
+        recsEl.className = "empty";
+        recsEl.textContent = "Recommendations will appear after analyzing uploaded reports.";
+      }
+    }
+
+    function exportMarkdown() {
+      if (!latestAnalysis || !latestAnalysis.summary?.has_data) {
+        alert("Load or upload reports before exporting.");
+        return;
+      }
+      const best = latestAnalysis.best_region_analysis || {};
+      const lines = [
+        "# AI Business Intelligence Summary Report",
+        "",
+        "## Executive Findings",
+        ...(latestAnalysis.summary.findings || []).map(f => `- ${f}`),
+        "",
+        `## Best-Performing Region: ${best.best_region || "N/A"}`,
+        best.explanation || "",
+        ...(best.reasons || []).map(r => `- ${r}`),
+        "",
+        "## Recommendations",
+        ...(latestAnalysis.recommendations || []).map(r => `- **[${r.priority}] ${r.title}**: ${r.action} (${r.rationale})`),
+      ];
+      const blob = new Blob([lines.join("\n")], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "bi_insights_report.md";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function askQuestion(queryText) {
+      const q = (queryText ?? document.getElementById("queryInput").value).trim();
+      if (!q) return;
+      document.getElementById("queryInput").value = q;
+      const res = await fetch("/api/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: q }),
+      });
+      if (res.status === 401) return showAuthView();
+      const data = await res.json();
+      const ansEl = document.getElementById("queryAnswer");
+      ansEl.className = "answer-box";
+      ansEl.textContent = data.answer || data.error || "No answer returned.";
+
+      const evEl = document.getElementById("queryEvidence");
+      const evidence = data.evidence || [];
+      evEl.innerHTML = evidence.map(e => `
+        <div class="evidence-item">
+          <strong>${esc(e.doc_name)} — ${esc(e.section)}</strong> (score: ${e.score})<br/>
+          ${esc(e.text)}
+        </div>
+      `).join("");
+    }
+
+    document.getElementById("tabLogin").addEventListener("click", () => {
+      authMode = "login";
+      document.getElementById("tabLogin").classList.add("active");
+      document.getElementById("tabRegister").classList.remove("active");
+      document.getElementById("authSubmitBtn").textContent = "Sign In";
+      document.getElementById("authError").textContent = "";
+    });
+
+    document.getElementById("tabRegister").addEventListener("click", () => {
+      authMode = "register";
+      document.getElementById("tabRegister").classList.add("active");
+      document.getElementById("tabLogin").classList.remove("active");
+      document.getElementById("authSubmitBtn").textContent = "Create Account";
+      document.getElementById("authError").textContent = "";
+    });
+
+    document.getElementById("authForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("authUsername").value;
+      const password = document.getElementById("authPassword").value;
+      const endpoint = authMode === "register" ? "/api/auth/register" : "/api/auth/login";
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        document.getElementById("authError").textContent = data.error || "Authentication failed.";
+        return;
+      }
+      document.getElementById("authError").textContent = "";
+      showAppView(data.username);
+    });
+
+    document.getElementById("demoLoginBtn").addEventListener("click", async () => {
+      const res = await fetch("/api/auth/demo", { method: "POST" });
+      const data = await res.json();
+      if (data.authenticated) showAppView(data.username);
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await fetch("/api/auth/logout", { method: "POST" });
+      showAuthView();
+    });
+
+    document.getElementById("fileInput").addEventListener("change", (e) => {
+      if (e.target.files.length) readFiles(e.target.files);
+    });
+
+    const dropzone = document.getElementById("dropzone");
+    dropzone.addEventListener("dragover", (e) => { e.preventDefault(); dropzone.classList.add("dragover"); });
+    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      if (e.dataTransfer.files.length) readFiles(e.dataTransfer.files);
+    });
+
+    document.getElementById("sampleBtn").addEventListener("click", async () => {
+      const res = await fetch("/api/load-samples", { method: "POST" });
+      if (res.status === 401) return showAuthView();
+      const data = await res.json();
+      renderAnalysis(data.analysis);
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", exportMarkdown);
+
+    document.getElementById("clearBtn").addEventListener("click", async () => {
+      const res = await fetch("/api/clear", { method: "POST" });
+      if (res.status === 401) return showAuthView();
+      const data = await res.json();
+      renderAnalysis(data.analysis);
+      document.getElementById("queryAnswer").textContent = "Ask a question above to retrieve relevant passages and metrics from your reports.";
+      document.getElementById("queryAnswer").className = "answer-box empty";
+      document.getElementById("queryEvidence").innerHTML = "";
+    });
+
+    document.getElementById("askBtn").addEventListener("click", () => askQuestion());
+    document.getElementById("queryInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") askQuestion();
+    });
+    document.querySelectorAll(".chip").forEach(btn => {
+      btn.addEventListener("click", () => askQuestion(btn.dataset.q));
+    });
+
+    checkSession();
+  </script>
+</body>
+</html>

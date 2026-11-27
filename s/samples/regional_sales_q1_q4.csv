@@ -1,0 +1,33 @@
+Quarter,Region,Category,Channel,Units_Sold,Revenue,Cost,Profit,YoY_Growth_Pct
+Q1,North America,Cloud Suite,Direct Enterprise,1420,420000,185000,235000,18.5
+Q1,North America,AI Analytics,Partner Network,860,260000,120000,140000,22.0
+Q2,North America,Cloud Suite,Direct Enterprise,1610,485000,205000,280000,21.4
+Q2,North America,AI Analytics,Direct Enterprise,980,315000,138000,177000,25.6
+Q3,North America,Cloud Suite,Direct Enterprise,1790,540000,225000,315000,24.1
+Q3,North America,AI Analytics,Partner Network,1120,360000,155000,205000,28.4
+Q4,North America,Cloud Suite,Direct Enterprise,2050,625000,250000,375000,27.0
+Q4,North America,AI Analytics,Direct Enterprise,1310,435000,175000,260000,31.2
+Q1,Europe,Cloud Suite,Partner Network,1050,310000,165000,145000,11.0
+Q1,Europe,Security Ops,Direct Enterprise,610,195000,110000,85000,9.5
+Q2,Europe,Cloud Suite,Partner Network,1140,340000,178000,162000,12.8
+Q2,Europe,Security Ops,Direct Enterprise,680,215000,122000,93000,10.2
+Q3,Europe,Cloud Suite,Partner Network,1190,355000,185000,170000,13.5
+Q3,Europe,Security Ops,Partner Network,720,230000,130000,100000,11.4
+Q4,Europe,Cloud Suite,Direct Enterprise,1340,410000,205000,205000,15.6
+Q4,Europe,Security Ops,Direct Enterprise,810,265000,145000,120000,13.0
+Q1,APAC,Cloud Suite,Self-Serve Web,980,220000,118000,102000,16.2
+Q1,APAC,AI Analytics,Partner Network,540,150000,86000,64000,19.0
+Q2,APAC,Cloud Suite,Self-Serve Web,1120,255000,134000,121000,18.4
+Q2,APAC,AI Analytics,Partner Network,630,178000,98000,80000,21.5
+Q3,APAC,Cloud Suite,Partner Network,1290,295000,152000,143000,22.0
+Q3,APAC,AI Analytics,Partner Network,710,205000,110000,95000,24.8
+Q4,APAC,Cloud Suite,Direct Enterprise,1460,345000,172000,173000,25.2
+Q4,APAC,AI Analytics,Partner Network,840,248000,128000,120000,26.5
+Q1,Latin America,Cloud Suite,Partner Network,420,95000,62000,33000,6.5
+Q1,Latin America,Security Ops,Self-Serve Web,260,58000,40000,18000,4.8
+Q2,Latin America,Cloud Suite,Partner Network,460,105000,68000,37000,7.1
+Q2,Latin America,Security Ops,Self-Serve Web,290,64000,44000,20000,5.2
+Q3,Latin America,Cloud Suite,Partner Network,510,118000,75000,43000,8.0
+Q3,Latin America,Security Ops,Self-Serve Web,315,71000,48000,23000,6.1
+Q4,Latin America,Cloud Suite,Partner Network,580,136000,84000,52000,9.4
+Q4,Latin America,Security Ops,Self-Serve Web,355,82000,54000,28000,7.5
